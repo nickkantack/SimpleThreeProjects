@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Sky } from 'three/addons/objects/Sky.js';
+
+import { SkyWithDirectionalLight } from './scenics.js';
 
 if ( WebGL.isWebGLAvailable() ) {
     
@@ -28,20 +29,29 @@ if ( WebGL.isWebGLAvailable() ) {
     yCube.rotation.x = Math.PI / 4;
     scene.add(yCube);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
     camera.position.z = 5;
 
-    initSky(scene);
+    const skyWithDirectionalLight = new SkyWithDirectionalLight(0, 180, scene, renderer);
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
+    // Add the resize listener
+    window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.render();
+    }); 
+
+    // Start the anmiation
     function animate() {
         requestAnimationFrame(animate);
 
         centerCube.rotation.x += 0.01;
         centerCube.rotation.y += 0.01;
+
+        skyWithDirectionalLight.tickSunPosition(0, -0.001);
+        skyWithDirectionalLight.sunPositionSpherical.phi = Math.PI / 2 - 1 / 20 + Math.sin(Date.now() / 1000) / 20;
 
         controls.update();
 
@@ -50,28 +60,6 @@ if ( WebGL.isWebGLAvailable() ) {
 	animate();
 
 } else {
-
 	const warning = WebGL.getWebGLErrorMessage();
 	document.getElementById( 'container' ).appendChild( warning );
-
-}
-
-
-function initSky(scene) {
-    const sky = new Sky();
-    sky.scale.setScalar( 450000 );
-    scene.add( sky );
-    // sky.material.uniforms.up.value = new THREE.Vector3(1, 0, 0);
-    const sun = new THREE.Vector3();
-    const elevation = 2;
-    const azimuth = 180;
-    const uniforms = sky.material.uniforms;
-    uniforms[ 'turbidity' ].value = 10;
-    uniforms[ 'rayleigh' ].value = 3;
-    uniforms[ 'mieCoefficient' ].value = 0.005;
-    uniforms[ 'mieDirectionalG' ].value = 0.7;
-    const phi = THREE.MathUtils.degToRad(90 - elevation);
-    const theta = THREE.MathUtils.degToRad(azimuth);
-    sun.setFromSphericalCoords( 1, phi, theta );
-    uniforms[ 'sunPosition' ].value.copy( sun );
 }
