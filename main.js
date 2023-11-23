@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { SkyWithDirectionalLight } from './scenics.js';
 
@@ -42,6 +43,15 @@ if ( WebGL.isWebGLAvailable() ) {
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.render();
     }); 
+
+    const loader = new GLTFLoader();
+    loader.load('./SculptingTutorial.glb', function (gltf) {
+        gltf.scene.position.setX(2);
+        gltf.scene.rotation.y = Math.PI;
+        scene.add(gltf.scene);
+    }, undefined, function (error) {
+        console.error(error);
+    });
 
     // Start the anmiation
     function animate() {
