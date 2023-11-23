@@ -47,7 +47,12 @@ if ( WebGL.isWebGLAvailable() ) {
     const loader = new GLTFLoader();
     loader.load('./SculptingTutorial.glb', function (gltf) {
         gltf.scene.position.setX(2);
+        gltf.scene.position.setY(2);
         gltf.scene.rotation.y = Math.PI;
+        const newMaterial = new THREE.MeshStandardMaterial({color: 0xff0000});
+        gltf.scene.traverse((o) => {
+        if (o.isMesh) o.material = newMaterial;
+        });
         scene.add(gltf.scene);
     }, undefined, function (error) {
         console.error(error);
