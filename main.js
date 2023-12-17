@@ -5,34 +5,25 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { SkyWithDirectionalLight } from './scenics.js';
 
-if ( WebGL.isWebGLAvailable() ) {
+if (WebGL.isWebGLAvailable()) {
     
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    // PerspectiveCamera(vertical fov angle degrees, aspect ratio (width/height), near plane distance, far plane distance)
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    const material = new THREE.MeshStandardMaterial( { color: 0xfffffff } );
-    const centerCube = new THREE.Mesh( geometry, material );
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({color: 0xfffffff});
+    const centerCube = new THREE.Mesh(geometry, material);
+    centerCube.position.x = 3;
     scene.add(centerCube);
-
-    const xCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({color: 0x00ff00}));
-    xCube.position.x = 2;
-    xCube.rotation.y = Math.PI / 4;
-    xCube.rotation.x = Math.PI / 4;
-    scene.add(xCube);
-    const yCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({color: 0xff0000}));
-    yCube.position.y = 2;
-    yCube.rotation.y = Math.PI / 4;
-    yCube.rotation.x = Math.PI / 4;
-    scene.add(yCube);
 
     camera.position.z = 5;
 
-    const skyWithDirectionalLight = new SkyWithDirectionalLight(0, 180, scene, renderer);
+    const skyWithDirectionalLight = new SkyWithDirectionalLight({elevation: 0, azimuth: 180, scene: scene, renderer: renderer});
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -45,13 +36,13 @@ if ( WebGL.isWebGLAvailable() ) {
     }); 
 
     const loader = new GLTFLoader();
-    loader.load('./SculptingTutorial.glb', function (gltf) {
-        gltf.scene.position.setX(2);
-        gltf.scene.position.setY(2);
+    loader.load('./Bear.glb', function (gltf) {
+        gltf.scene.position.setX(0);
+        gltf.scene.position.setY(0);
         gltf.scene.rotation.y = Math.PI;
-        const newMaterial = new THREE.MeshStandardMaterial({color: 0xff0000});
+        const newMaterial = new THREE.MeshStandardMaterial({color: 0xffffff});
         gltf.scene.traverse((o) => {
-        if (o.isMesh) o.material = newMaterial;
+            if (o.isMesh) o.material = newMaterial;
         });
         scene.add(gltf.scene);
     }, undefined, function (error) {
@@ -76,5 +67,5 @@ if ( WebGL.isWebGLAvailable() ) {
 
 } else {
 	const warning = WebGL.getWebGLErrorMessage();
-	document.getElementById( 'container' ).appendChild( warning );
+	document.getElementById('container').appendChild(warning);
 }
