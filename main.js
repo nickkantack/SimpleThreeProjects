@@ -8,6 +8,8 @@ import { SkyWithDirectionalLight } from './scenics.js';
 
 let productMesh = null;
 let productMeshArgument = 0;
+let sprayDroplets = [];
+let sprayDropletDirections = [];
 
 function buildCan(scene) {
 
@@ -57,6 +59,22 @@ function buildCan(scene) {
 
 }
 
+function createSpray(scene) {
+
+    for (let i = 0; i < 180; i++) {
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshStandardMaterial({color: 0xffffff00});
+        const centerCube = new THREE.Mesh(geometry, material); 
+        centerCube.scale.set(.01, .01, .01);
+        centerCube.position.y = 0.25;
+        scene.add(centerCube);
+
+        sprayDroplets.push(centerCube);
+        sprayDropletDirections.push(new THREE.Vector3(Math.random() - 3, 0.5 - Math.random(), 0.5 - Math.random()));
+    }
+
+}
+
 if (WebGL.isWebGLAvailable()) {
     
     const scene = new THREE.Scene();
@@ -67,11 +85,7 @@ if (WebGL.isWebGLAvailable()) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshStandardMaterial({color: 0xfffffff});
-    const centerCube = new THREE.Mesh(geometry, material);
-    centerCube.position.x = 3;
-    scene.add(centerCube);
+    createSpray(scene);
 
     camera.position.z = 5;
 
@@ -110,12 +124,25 @@ if (WebGL.isWebGLAvailable()) {
     function animate() {
         requestAnimationFrame(animate);
 
-        centerCube.rotation.x += 0.01;
-        centerCube.rotation.y += 0.01;
-
         if (productMesh) {
             productMeshArgument += 0.02;
-            productMesh.position.y = Math.sin(productMeshArgument) > 0 ? 0.5 * Math.sin(productMeshArgument) : 0;
+            if (Math.sin(productMeshArgument) > 0) {
+                productMesh.position.y = 0.5 * Math.sin(productMeshArgument);
+                if (sprayDroplets[0].position.x < 0) {
+                    for (let i = 0; i < sprayDroplets.length; i++) {
+                        sprayDroplets[i].position.x = 0;
+                        sprayDroplets[i].position.y = 0.25;
+                        sprayDroplets[i].position.z = 0;
+                    }
+                }
+            } else {
+                productMesh.position.y = 0;
+                for (let i = 0; i < sprayDroplets.length; i++) {
+                    if (i < (productMeshArgument % (Math.PI * 2) - Math.PI) / Math.PI * sprayDroplets.length) {
+                        sprayDroplets[i].position.add(sprayDropletDirections[i].clone().multiplyScalar(0.01));
+                    }
+                }
+            }
         }
 
         /*
