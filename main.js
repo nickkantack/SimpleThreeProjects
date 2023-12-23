@@ -61,12 +61,14 @@ function buildCan(scene) {
 
 function createSpray(scene) {
 
-    for (let i = 0; i < 180; i++) {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
+    for (let i = 0; i < 1000; i++) {
+        const geometry = new THREE.BoxGeometry(.02, .02, .02);
         const material = new THREE.MeshStandardMaterial({color: 0xffffff00});
         const centerCube = new THREE.Mesh(geometry, material); 
-        centerCube.scale.set(.01, .01, .01);
         centerCube.position.y = 0.25;
+        centerCube.rotation.x = Math.random(); 
+        centerCube.rotation.y = Math.random(); 
+        centerCube.rotation.z = Math.random(); 
         scene.add(centerCube);
 
         sprayDroplets.push(centerCube);
@@ -124,22 +126,30 @@ if (WebGL.isWebGLAvailable()) {
     function animate() {
         requestAnimationFrame(animate);
 
-        if (productMesh) {
-            productMeshArgument += 0.02;
-            if (Math.sin(productMeshArgument) > 0) {
-                productMesh.position.y = 0.5 * Math.sin(productMeshArgument);
-                if (sprayDroplets[0].position.x < 0) {
-                    for (let i = 0; i < sprayDroplets.length; i++) {
-                        sprayDroplets[i].position.x = 0;
-                        sprayDroplets[i].position.y = 0.25;
-                        sprayDroplets[i].position.z = 0;
+        // First if is used to stop the animation after it has repeated a few times
+        if (productMeshArgument < 2 * Math.PI) {
+
+            // This if defers trying to manipulated the productMesh until it is defined (since this method might be called before the 
+            // mesh is loaded)
+            if (productMesh) {
+                productMeshArgument += 0.02;
+                if (Math.sin(productMeshArgument) > 0) {
+                    // In this phase of the animation, the product is being attached/detached from the can
+                    productMesh.position.y = 0.5 * Math.sin(productMeshArgument);
+                    if (sprayDroplets[0].position.x < 0) {
+                        for (let i = 0; i < sprayDroplets.length; i++) {
+                            sprayDroplets[i].position.x = 0;
+                            sprayDroplets[i].position.y = 0.25;
+                            sprayDroplets[i].position.z = 0;
+                        }
                     }
-                }
-            } else {
-                productMesh.position.y = 0;
-                for (let i = 0; i < sprayDroplets.length; i++) {
-                    if (i < (productMeshArgument % (Math.PI * 2) - Math.PI) / Math.PI * sprayDroplets.length) {
-                        sprayDroplets[i].position.add(sprayDropletDirections[i].clone().multiplyScalar(0.01));
+                } else {
+                    // in this phase of the animation, the can is sparing will the product is seated on the can
+                    productMesh.position.y = 0;
+                    for (let i = 0; i < sprayDroplets.length; i++) {
+                        if (i < (productMeshArgument % (Math.PI * 2) - Math.PI) / Math.PI * sprayDroplets.length) {
+                            sprayDroplets[i].position.add(sprayDropletDirections[i].clone().multiplyScalar(0.01));
+                        }
                     }
                 }
             }
