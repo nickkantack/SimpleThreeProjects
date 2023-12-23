@@ -2,8 +2,60 @@ import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 
 import { SkyWithDirectionalLight } from './scenics.js';
+
+let productMesh = null;
+let productMeshArgument = 0;
+
+function buildCan(scene) {
+
+    const stlLoader = new STLLoader();
+    stlLoader.load(
+        './can.stl',
+        function (geometry) {
+            const material = new THREE.MeshStandardMaterial({color: 0xff00c0ff});
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.scale.set(.01, .01, .01);
+            mesh.rotation.x = -Math.PI / 2;
+            scene.add(mesh)
+        },
+        (error) => {
+            console.log(error)
+        }
+    );
+
+    stlLoader.load(
+        './nozzle_rim.stl',
+        function (geometry) {
+            const material = new THREE.MeshStandardMaterial({color: 0xffcccccc});
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.scale.set(.01, .01, .01);
+            mesh.rotation.x = -Math.PI / 2;
+            scene.add(mesh)
+        },
+        (error) => {
+            console.log(error)
+        }
+    );
+
+    stlLoader.load(
+        './squirter.stl',
+        function (geometry) {
+            const material = new THREE.MeshStandardMaterial({color: 0xffffff00});
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.scale.set(.01, .01, .01);
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.rotation.z = Math.PI / 2;
+            scene.add(mesh)
+        },
+        (error) => {
+            console.log(error)
+        }
+    );
+
+}
 
 if (WebGL.isWebGLAvailable()) {
     
@@ -23,7 +75,7 @@ if (WebGL.isWebGLAvailable()) {
 
     camera.position.z = 5;
 
-    const skyWithDirectionalLight = new SkyWithDirectionalLight({elevation: 0, azimuth: 180, scene: scene, renderer: renderer});
+    const skyWithDirectionalLight = new SkyWithDirectionalLight({elevation: 30, azimuth: 0, scene: scene, renderer: renderer});
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -35,19 +87,24 @@ if (WebGL.isWebGLAvailable()) {
         renderer.render();
     }); 
 
-    const loader = new GLTFLoader();
-    loader.load('./Bear.glb', function (gltf) {
-        gltf.scene.position.setX(0);
-        gltf.scene.position.setY(0);
-        gltf.scene.rotation.y = Math.PI;
-        const newMaterial = new THREE.MeshStandardMaterial({color: 0xffffff});
-        gltf.scene.traverse((o) => {
-            if (o.isMesh) o.material = newMaterial;
-        });
-        scene.add(gltf.scene);
-    }, undefined, function (error) {
-        console.error(error);
-    });
+    buildCan(scene);
+
+    const stlLoader = new STLLoader();
+    stlLoader.load(
+        './product.stl',
+        function (geometry) {
+            const material = new THREE.MeshStandardMaterial({color: 0xff00aa00});
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.scale.set(.01, .01, .01);
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.rotation.z = Math.PI / 2;
+            scene.add(mesh)
+            productMesh = mesh;
+        },
+        (error) => {
+            console.log(error)
+        }
+    );
 
     // Start the anmiation
     function animate() {
@@ -56,8 +113,16 @@ if (WebGL.isWebGLAvailable()) {
         centerCube.rotation.x += 0.01;
         centerCube.rotation.y += 0.01;
 
+        if (productMesh) {
+            productMeshArgument += 0.02;
+            productMesh.position.y = Math.sin(productMeshArgument) > 0 ? 0.5 * Math.sin(productMeshArgument) : 0;
+        }
+
+        /*
+        Rotate the sun
         skyWithDirectionalLight.tickSunPosition(0, -0.001);
         skyWithDirectionalLight.sunPositionSpherical.phi = Math.PI / 2 - 1 / 20 + Math.sin(Date.now() / 1000) / 20;
+        */
 
         controls.update();
 
