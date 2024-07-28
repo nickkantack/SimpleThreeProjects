@@ -69,6 +69,11 @@ if (WebGL.isWebGLAvailable()) {
 
         // Make the camera follow the plane
         camera.lookAt(planeGroup.position);
+        camera.up.copy(new THREE.Vector3(1, 0, 0).clone().normalize());
+        const lookDirection = new THREE.Vector3();
+        camera.getWorldDirection(lookDirection);
+        const cameraQuaterion = new THREE.Quaternion().setFromAxisAngle(lookDirection, -Math.PI / 2);
+        camera.applyQuaternion(cameraQuaterion);
 
         renderer.render(scene, camera);
     }
