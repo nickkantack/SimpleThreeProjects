@@ -84,10 +84,10 @@ function createJoystick(id, x, y, parent) {
         innerJoystick.style.transform = `translate(${-outerJoystickOutsideRadius}px, ${-outerJoystickOutsideRadius}px)`;
     }
 
-    document.body.addEventListener("mouseup", standardMouseup);
-    document.body.addEventListener("touchend", standardMouseup);
-    document.body.addEventListener("mousemove", updateJoystickPosition);
-    document.body.addEventListener("touchmove", (event) => {
+    innerJoystick.addEventListener("mouseup", standardMouseup);
+    innerJoystick.addEventListener("touchend", standardMouseup);
+    innerJoystick.addEventListener("mousemove", updateJoystickPosition);
+    innerJoystick.addEventListener("touchmove", (event) => {
         updateJoystickPosition(event.touches[joystickToTouchMap[id]]);
     });
     
