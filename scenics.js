@@ -13,7 +13,7 @@ class SkyWithDirectionalLight {
         this.sky = new Sky();
         this.sky.scale.setScalar(450000);
         input.scene.add(this.sky);
-        // sky.material.uniforms.up.value = new THREE.Vector3(1, 0, 0);
+        this.sky.material.uniforms.up.value = new THREE.Vector3(1, 0, 0);
         const uniforms = this.sky.material.uniforms;
         uniforms['turbidity'].value = 7.1;
         uniforms['rayleigh'].value = 1.119;

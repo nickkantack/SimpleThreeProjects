@@ -3,11 +3,11 @@ const outerJoystickOutsideRadius = 120;
 const outerJoystickRingRadialThickness = 10;
 const innerJoystickRadius = 35;
 
-isJoystickHeldMap = {};
-anchorMap = {};
-joystickToTouchMap = {};
-joystickToVectorMap = {};
-doesUpperJoystickHaveFirstTouch = false;
+const isJoystickHeldMap = {};
+const anchorMap = {};
+const joystickToTouchMap = {};
+const joystickToVectorMap = {};
+let doesUpperJoystickHaveFirstTouch = false;
 
 initializeControls(document.body);
 
@@ -107,3 +107,5 @@ function createJoystick(id, x, y, parent) {
     }
 
 }
+
+export { isJoystickHeldMap, joystickToVectorMap }
