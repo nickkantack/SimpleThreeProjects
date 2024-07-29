@@ -36,20 +36,20 @@ function evolvePhysics() {
 
     // Compute net forces on the plane
     let netForce = new THREE.Vector3();
-    const MAX_THRUST_N = 200;
+    const MAX_THRUST_N = 100;
     const thrustForce = forwardVector.clone().multiplyScalar(MAX_THRUST_N * currentThrottle);
     netForce.add(thrustForce);
-    const DRAG_N_PER_VEL_SQ = 0.3;
+    const DRAG_N_PER_VEL_SQ = 0.01;
     const dragForce = velocity.clone().multiplyScalar(-DRAG_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(dragForce);
 
     // Add gravity
-    const GRAVITY = 20;
+    const GRAVITY = 10;
     const gravityForce = new THREE.Vector3(-1, 0, 0).multiplyScalar(GRAVITY);
     netForce.add(gravityForce);
 
     // Add lift
-    const LIFT_N_PER_VEL_SQ = 0.3;
+    const LIFT_N_PER_VEL_SQ = 0.03;
     const liftForce = canopyVector.clone().multiplyScalar(LIFT_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(liftForce);
 
@@ -78,9 +78,19 @@ function evolvePhysics() {
         }
     }
 
+    // Drift the velocity a bit towards the forward vector 
+    let correctionAngle = angleBetween(velocity, forwardVector);
+    const REALIGN_FORCE = 0.8;
+    if (correctionAngle > 0) {
+        correctionAngle *= dt * REALIGN_FORCE;
+        const rotationAxis = new THREE.Vector3().crossVectors(velocity, forwardVector);
+        const correctionQuaterion = new THREE.Quaternion().setFromAxisAngle(rotationAxis, correctionAngle);
+        velocity.applyQuaternion(correctionQuaterion);
+    }
+
     // Drift the nose a bit towards the direction of travel
-    let correctionAngle = angleBetween(forwardVector, velocity);
-    const AERO_FORCES = 1;
+    correctionAngle = angleBetween(forwardVector, velocity);
+    const AERO_FORCES = 0.4;
     if (correctionAngle > 0) {
         correctionAngle *= dt * AERO_FORCES;
         const rotationAxis = new THREE.Vector3().crossVectors(forwardVector, velocity);
@@ -97,19 +107,18 @@ function evolvePhysics() {
     of quality, but torwards zero velocity this control degrades to zero.
     */
     const CONTROL_THRESHOLD_SPEED = 10;
-    const controlFraction = 1 - Math.exp(-velocity.length() / CONTROL_THRESHOLD_SPEED)
+    const controlFraction = 1 - Math.exp(-velocity.length() / CONTROL_THRESHOLD_SPEED);
 
     // Rotation due to elevator
     const MAX_ELEVATOR_ANGULAR_SPEED = 3;
     const elevatorInput = -controlFraction * MAX_ELEVATOR_ANGULAR_SPEED * currentElevator;
-    console.log(controlFraction);
     const elevatorQuaterion = new THREE.Quaternion().setFromAxisAngle(rightWingVector, elevatorInput * dt);
     forwardVector.applyQuaternion(elevatorQuaterion);
     canopyVector.applyQuaternion(elevatorQuaterion);
     rightWingVector.applyQuaternion(elevatorQuaterion);
 
     // Rotation due to rudder
-    const MAX_RUDDER_ANGULAR_SPEED = 3;
+    const MAX_RUDDER_ANGULAR_SPEED = 0.2;
     const rudderInput = -controlFraction * MAX_RUDDER_ANGULAR_SPEED * currentRudder;
     console.log(controlFraction);
     const rudderQuaterion = new THREE.Quaternion().setFromAxisAngle(canopyVector, rudderInput * dt);
@@ -118,7 +127,7 @@ function evolvePhysics() {
     rightWingVector.applyQuaternion(rudderQuaterion);
 
     // Rotation due to aileron
-    const MAX_AILERON_ANGULAR_SPEED = 3;
+    const MAX_AILERON_ANGULAR_SPEED = 4;
     const aileronInput = controlFraction * MAX_AILERON_ANGULAR_SPEED * currentAileron;
     console.log(controlFraction);
     const aileronQuaterion = new THREE.Quaternion().setFromAxisAngle(forwardVector, aileronInput * dt);
