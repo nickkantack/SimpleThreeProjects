@@ -49,11 +49,9 @@ function evolvePhysics() {
     netForce.add(gravityForce);
 
     // Add lift
-    const LIFT_N_PER_VEL_SQ = 0.03;
+    const LIFT_N_PER_VEL_SQ = 0.025;
     const liftForce = canopyVector.clone().multiplyScalar(LIFT_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(liftForce);
-
-    console.log(`Lift: ${liftForce.length()} Gravity: ${gravityForce.length()} Velocity: ${velocity.length()}`);
 
     const netAcceleration = netForce.clone().multiplyScalar(1 / planeMassKg);
 
@@ -134,6 +132,11 @@ function evolvePhysics() {
     forwardVector.applyQuaternion(aileronQuaterion);
     canopyVector.applyQuaternion(aileronQuaterion);
     rightWingVector.applyQuaternion(aileronQuaterion);
+
+    // Guarantee that forward, canopy, and rightWing vectors are orthonormal
+    canopyVector.normalize();
+    rightWingVector = new THREE.Vector3().crossVectors(forwardVector, canopyVector).normalize();
+    forwardVector = new THREE.Vector3().crossVectors(canopyVector, rightWingVector);
 
     return [position, forwardVector, canopyVector, rightWingVector];
 
