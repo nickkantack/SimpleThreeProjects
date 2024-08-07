@@ -23,7 +23,7 @@ function updateControls(leftJoystickVector, rightJoystickVector) {
 
     currentThrottle = leftJoystickVector[0] / 2 + 0.5;
     currentRudder = leftJoystickVector[1];
-    currentElevator = -rightJoystickVector[0];
+    currentElevator = rightJoystickVector[0];
     currentAileron = rightJoystickVector[1];
 
 }
@@ -36,10 +36,10 @@ function evolvePhysics() {
 
     // Compute net forces on the plane
     let netForce = new THREE.Vector3();
-    const MAX_THRUST_N = 30;
+    const MAX_THRUST_N = 10;
     const thrustForce = forwardVector.clone().multiplyScalar(MAX_THRUST_N * currentThrottle);
     netForce.add(thrustForce);
-    const DRAG_N_PER_VEL_SQ = 0.008;
+    const DRAG_N_PER_VEL_SQ = 0.025;
     const dragForce = velocity.clone().normalize().multiplyScalar(-DRAG_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(dragForce);
 
@@ -104,7 +104,7 @@ function evolvePhysics() {
     idea is that at high and moderate velocities control surfaces work to some standard level
     of quality, but torwards zero velocity this control degrades to zero.
     */
-    const CONTROL_THRESHOLD_SPEED = 20;
+    const CONTROL_THRESHOLD_SPEED = 10;
     const controlFraction = 1 / (1 + Math.exp(-0.3 * (velocity.length() - CONTROL_THRESHOLD_SPEED)));
 
     // Rotation due to elevator
