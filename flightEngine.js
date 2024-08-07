@@ -36,15 +36,15 @@ function evolvePhysics() {
 
     // Compute net forces on the plane
     let netForce = new THREE.Vector3();
-    const MAX_THRUST_N = 100;
+    const MAX_THRUST_N = 30;
     const thrustForce = forwardVector.clone().multiplyScalar(MAX_THRUST_N * currentThrottle);
     netForce.add(thrustForce);
-    const DRAG_N_PER_VEL_SQ = 0.01;
-    const dragForce = velocity.clone().multiplyScalar(-DRAG_N_PER_VEL_SQ * velocity.lengthSq());
+    const DRAG_N_PER_VEL_SQ = 0.008;
+    const dragForce = velocity.clone().normalize().multiplyScalar(-DRAG_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(dragForce);
 
     // Add gravity
-    const GRAVITY = 10;
+    const GRAVITY = 15;
     const gravityForce = new THREE.Vector3(-1, 0, 0).multiplyScalar(GRAVITY);
     netForce.add(gravityForce);
 
@@ -104,8 +104,8 @@ function evolvePhysics() {
     idea is that at high and moderate velocities control surfaces work to some standard level
     of quality, but torwards zero velocity this control degrades to zero.
     */
-    const CONTROL_THRESHOLD_SPEED = 10;
-    const controlFraction = 1 - Math.exp(-velocity.length() / CONTROL_THRESHOLD_SPEED);
+    const CONTROL_THRESHOLD_SPEED = 20;
+    const controlFraction = 1 / (1 + Math.exp(-0.3 * (velocity.length() - CONTROL_THRESHOLD_SPEED)));
 
     // Rotation due to elevator
     const MAX_ELEVATOR_ANGULAR_SPEED = 3;

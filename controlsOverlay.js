@@ -14,8 +14,8 @@ initializeControls(document.body);
 function initializeControls(parent) {
 
     // Create the top joystick
-    const upperJoystick = createJoystick("upperJoystick", 20, 20, parent);
-    const lowerJoystick = createJoystick("lowerJoystick", 80, 20, parent);
+    const upperJoystick = createJoystick("upperJoystick", 20, 30, parent);
+    const lowerJoystick = createJoystick("lowerJoystick", 80, 30, parent);
     // TODO create another joystick
 
 }
