@@ -2,9 +2,10 @@ import * as THREE from 'three';
 
 function createPlaneGroup(scene) {
 
-    const material = new THREE.MeshStandardMaterial({color: 0xff0000});
+    const material = new THREE.MeshStandardMaterial({color: 0xffff00});
     const fuselageGeometry = new THREE.SphereGeometry();
     const wingGeometry = new THREE.BoxGeometry();
+    const wingBottomGeometry = new THREE.BoxGeometry();
     const tailGeometry = new THREE.BoxGeometry();
     const rudderGeometry = new THREE.BoxGeometry();
 
@@ -14,6 +15,9 @@ function createPlaneGroup(scene) {
 
     const wingMesh = new THREE.Mesh(wingGeometry, material);
     wingMesh.scale.set(1, 0.1, 4);
+
+    const wingBottomMesh = new THREE.Mesh(wingBottomGeometry, new THREE.MeshStandardMaterial({color: 0x000000}));
+    wingBottomMesh.scale.set(0.99, 0.1, 3.99);
 
     const tailMesh = new THREE.Mesh(tailGeometry, material);
     tailMesh.scale.set(1, 0.1, 2);
@@ -25,11 +29,13 @@ function createPlaneGroup(scene) {
     const group = new THREE.Group();
     group.add(fuselageMesh);
     group.add(wingMesh);
+    group.add(wingBottomMesh);
     group.add(tailMesh);
     group.add(rudderMesh);
 
     fuselageMesh.position.set(0, 0, 0);
     wingMesh.position.set(0.3, 0.25, 0);
+    wingBottomMesh.position.set(0.3, 0.2, 0);
     tailMesh.position.set(-1.5, 0.15, 0);
     rudderMesh.position.set(-1.5, 0.4, 0);
 

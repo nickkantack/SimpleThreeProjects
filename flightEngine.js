@@ -49,7 +49,7 @@ function evolvePhysics() {
     netForce.add(gravityForce);
 
     // Add lift
-    const LIFT_N_PER_VEL_SQ = 0.025;
+    const LIFT_N_PER_VEL_SQ = 0.015;
     const liftForce = canopyVector.clone().multiplyScalar(LIFT_N_PER_VEL_SQ * velocity.lengthSq());
     netForce.add(liftForce);
 
@@ -118,7 +118,6 @@ function evolvePhysics() {
     // Rotation due to rudder
     const MAX_RUDDER_ANGULAR_SPEED = 0.2;
     const rudderInput = -controlFraction * MAX_RUDDER_ANGULAR_SPEED * currentRudder;
-    console.log(controlFraction);
     const rudderQuaterion = new THREE.Quaternion().setFromAxisAngle(canopyVector, rudderInput * dt);
     forwardVector.applyQuaternion(rudderQuaterion);
     canopyVector.applyQuaternion(rudderQuaterion);
@@ -127,7 +126,6 @@ function evolvePhysics() {
     // Rotation due to aileron
     const MAX_AILERON_ANGULAR_SPEED = 4;
     const aileronInput = controlFraction * MAX_AILERON_ANGULAR_SPEED * currentAileron;
-    console.log(controlFraction);
     const aileronQuaterion = new THREE.Quaternion().setFromAxisAngle(forwardVector, aileronInput * dt);
     forwardVector.applyQuaternion(aileronQuaterion);
     canopyVector.applyQuaternion(aileronQuaterion);
