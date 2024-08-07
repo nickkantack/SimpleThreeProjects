@@ -104,11 +104,11 @@ function evolvePhysics() {
     idea is that at high and moderate velocities control surfaces work to some standard level
     of quality, but torwards zero velocity this control degrades to zero.
     */
-    const CONTROL_THRESHOLD_SPEED = 10;
+    const CONTROL_THRESHOLD_SPEED = 7;
     const controlFraction = 1 / (1 + Math.exp(-0.3 * (velocity.length() - CONTROL_THRESHOLD_SPEED)));
 
     // Rotation due to elevator
-    const MAX_ELEVATOR_ANGULAR_SPEED = 3;
+    const MAX_ELEVATOR_ANGULAR_SPEED = 2;
     const elevatorInput = -controlFraction * MAX_ELEVATOR_ANGULAR_SPEED * currentElevator;
     const elevatorQuaterion = new THREE.Quaternion().setFromAxisAngle(rightWingVector, elevatorInput * dt);
     forwardVector.applyQuaternion(elevatorQuaterion);
@@ -124,7 +124,7 @@ function evolvePhysics() {
     rightWingVector.applyQuaternion(rudderQuaterion);
 
     // Rotation due to aileron
-    const MAX_AILERON_ANGULAR_SPEED = 4;
+    const MAX_AILERON_ANGULAR_SPEED = 5;
     const aileronInput = controlFraction * MAX_AILERON_ANGULAR_SPEED * currentAileron;
     const aileronQuaterion = new THREE.Quaternion().setFromAxisAngle(forwardVector, aileronInput * dt);
     forwardVector.applyQuaternion(aileronQuaterion);
